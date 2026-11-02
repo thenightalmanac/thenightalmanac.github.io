@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Night Almanac</title>
+<meta name="description" content="A desktop astrology app that reads your real birth chart in plain language, in Western and Vedic astrology, and shows its reasoning. One payment of $9.99. No subscription, no account; your birth details stay on your computer.">
+<meta property="og:title" content="The Night Almanac">
+<meta property="og:description" content="Your stars, read clearly and honestly. Western and Vedic astrology in plain language. $9.99 once, no subscription.">
+<meta property="og:image" content="img/chart-light.webp">
+<meta name="theme-color" content="#160f1c">
+<link rel="icon" href="img/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="img/icon-180.png">
+<style>
+@font-face{font-family:"Cormorant Garamond";font-weight:500;font-style:normal;font-display:swap;src:url(fonts/cormorant-garamond-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:"Cormorant Garamond";font-weight:600;font-style:normal;font-display:swap;src:url(fonts/cormorant-garamond-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Cormorant Garamond";font-weight:500;font-style:italic;font-display:swap;src:url(fonts/cormorant-garamond-latin-500-italic.woff2) format("woff2")}
+@font-face{font-family:"Jost";font-weight:400;font-style:normal;font-display:swap;src:url(fonts/jost-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Jost";font-weight:500;font-style:normal;font-display:swap;src:url(fonts/jost-latin-500-normal.woff2) format("woff2")}
+
+:root{
+  --bg:#f7f1f4; --surface:#fffcfd; --ink:#2d1d33; --muted:#75637b; --line:#e9dce6;
+  --brass:#8a682b; --brass-soft:#f6ecdc; --rose:#a9506f; --rose-soft:#f8e9ef;
+  --night:#160f1c; --night-2:#21172a; --night-ink:#f2e9f0; --night-muted:#b6a4b8; --gold:#e2c07c;
+  --shadow:0 1px 2px rgba(45,29,51,.06),0 14px 40px rgba(45,29,51,.10);
+  --display:"Cormorant Garamond","Iowan Old Style",Garamond,Georgia,serif;
+  --body:"Jost","Avenir Next","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#160f1c; --surface:#21172a; --ink:#f2e9f0; --muted:#b6a4b8; --line:#3b2c44;
+    --brass:#e2c07c; --brass-soft:#3a2d1f; --rose:#eb9bb8; --rose-soft:#3a2232;
+    --night:#0f0a14; --night-2:#1b1322;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 14px 40px rgba(0,0,0,.35); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#160f1c; --surface:#21172a; --ink:#f2e9f0; --muted:#b6a4b8; --line:#3b2c44;
+  --brass:#e2c07c; --brass-soft:#3a2d1f; --rose:#eb9bb8; --rose-soft:#3a2232;
+  --night:#0f0a14; --night-2:#1b1322;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 14px 40px rgba(0,0,0,.35); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--rose)}
+h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;margin:0;text-wrap:balance}
+p{margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.eyebrow{font:500 .78rem/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--rose)}
+
+/* ---------- top bar */
+.top{position:absolute;inset:0 0 auto;z-index:2}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:76px}
+.brand{display:flex;align-items:center;gap:12px;color:var(--night-ink);text-decoration:none;font:600 1.35rem var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}
+.top nav{display:flex;gap:26px;align-items:center}
+.top nav a{color:var(--night-muted);text-decoration:none;font-size:.95rem}
+.top nav a:hover{color:var(--night-ink)}
+.top nav .buy-sm{color:var(--night);background:var(--gold);padding:8px 16px;border-radius:999px;font-weight:500}
+.top nav .buy-sm:hover{color:var(--night);filter:brightness(1.06)}
+
+/* ---------- hero */
+.hero{position:relative;overflow:hidden;background:radial-gradient(120% 90% at 78% 10%,#3a2547 0%,var(--night-2) 45%,var(--night) 100%);color:var(--night-ink);padding:150px 0 90px}
+.stars{position:absolute;inset:0;pointer-events:none;opacity:.9}
+.hero .wrap{position:relative;display:grid;grid-template-columns:1.02fr 1fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(2.7rem,6vw,4.6rem);font-weight:500;letter-spacing:-.01em}
+.hero h1 em{font-style:italic;color:var(--gold)}
+.hero .lede{margin-top:22px;font-size:1.15rem;color:var(--night-muted);max-width:33em}
+.cta{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:34px}
+.btn{display:inline-flex;align-items:center;gap:10px;font:500 1.02rem var(--body);text-decoration:none;border-radius:999px;padding:14px 26px;border:1px solid transparent;cursor:pointer}
+.btn-gold{background:var(--gold);color:#1d1424}
+.btn-gold:hover{filter:brightness(1.06)}
+.btn-ghost{color:var(--night-ink);border-color:rgba(242,233,240,.28)}
+.btn-ghost:hover{border-color:rgba(242,233,240,.6)}
+.price{font:600 1.15rem var(--body)}
+.fine-hero{margin-top:16px;font-size:.88rem;color:var(--night-muted)}
+.hero-shot{position:relative}
+.frame{border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.07);background:#21172a}
+.frame .bar{height:26px;display:flex;align-items:center;gap:6px;padding:0 11px;background:#2a1f33}
+.frame .bar i{width:9px;height:9px;border-radius:50%;background:#4a3a55}
+.hero-shot .frame{transform:rotate(-1.2deg)}
+.moon-deco{position:absolute;right:-60px;top:-70px;width:260px;height:260px;border-radius:50%;box-shadow:inset -38px 18px 0 0 rgba(226,192,124,.16);pointer-events:none}
+
+/* ---------- promise strip */
+.promise{padding:72px 0}
+.promise ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.promise li{border-top:1px solid var(--line);padding-top:18px}
+.promise strong{display:block;font:600 1.4rem/1.2 var(--display);margin-bottom:6px}
+.promise span{color:var(--muted);font-size:.96rem}
+
+/* ---------- features */
+.section-head{max-width:640px;margin-bottom:48px}
+.section-head h2{font-size:clamp(2rem,4vw,2.9rem);font-weight:500;margin-top:12px}
+.section-head p{color:var(--muted);margin-top:14px}
+.features{padding:56px 0 40px}
+.feat{display:grid;grid-template-columns:1fr 1.25fr;gap:56px;align-items:center;padding:44px 0}
+.feat:nth-child(even) .feat-text{order:2}
+.feat h3{font-size:2rem;font-weight:500;margin-top:10px}
+.feat p{color:var(--muted);margin-top:14px}
+.feat ul{margin:16px 0 0;padding:0 0 0 1.1em;color:var(--ink)}
+.feat li{margin:4px 0}
+.feat li::marker{color:var(--brass)}
+.feat .frame{background:var(--surface)}
+.feat .frame .bar{background:var(--line)}
+.feat .frame .bar i{background:color-mix(in srgb,var(--muted) 45%,transparent)}
+.feat figure{margin:0}
+.feat .frame{box-shadow:var(--shadow);border:1px solid var(--line)}
+
+.more{padding:40px 0 80px}
+.more-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px 24px 22px}
+.tile h3{font-size:1.45rem;font-weight:600}
+.tile p{color:var(--muted);font-size:.95rem;margin-top:8px}
+.glyph{font:500 1.6rem/1 var(--display);color:var(--brass);margin-bottom:12px}
+
+/* ---------- honest */
+.honest{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:80px 0}
+.honest .wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+.honest h2{font-size:clamp(2rem,4vw,2.7rem);font-weight:500;margin-top:12px}
+.honest p{color:var(--muted);margin-top:16px}
+.quote{border-left:2px solid var(--brass);padding:4px 0 4px 22px;font:italic 500 1.45rem/1.4 var(--display);color:var(--ink)}
+.quote small{display:block;margin-top:10px;font:400 .9rem var(--body);font-style:normal;color:var(--muted)}
+
+/* ---------- buy */
+.buy{padding:96px 0}
+.buy-card{background:linear-gradient(160deg,var(--night-2),var(--night));color:var(--night-ink);border-radius:22px;padding:56px;display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center;position:relative;overflow:hidden}
+.buy-card h2{font-size:clamp(2rem,4vw,3rem);font-weight:500}
+.buy-card .big{font:500 4rem/1 var(--display);color:var(--gold)}
+.buy-card .big small{font:400 1rem var(--body);color:var(--night-muted);margin-left:8px}
+.buy-card ul{list-style:none;margin:20px 0 0;padding:0;color:var(--night-muted)}
+.buy-card li{padding:7px 0;border-top:1px solid rgba(242,233,240,.1)}
+.buy-card li::before{content:"✦";color:var(--gold);margin-right:10px;font-size:.8em}
+.platforms{display:grid;gap:12px}
+.plat{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 18px;border:1px solid rgba(242,233,240,.14);border-radius:12px}
+.plat b{font-weight:500}
+.plat span{color:var(--night-muted);font-size:.88rem}
+
+/* ---------- faq */
+.faq{padding:24px 0 96px}
+.faq .wrap{max-width:800px}
+details{border-bottom:1px solid var(--line);padding:20px 0}
+summary{cursor:pointer;font:600 1.3rem var(--display);list-style:none;display:flex;justify-content:space-between;gap:20px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--brass);font-family:var(--body);font-weight:400}
+details[open] summary::after{content:"–"}
+details p{color:var(--muted);margin-top:10px}
+
+/* ---------- footer */
+footer{border-top:1px solid var(--line);padding:40px 0 56px;color:var(--muted);font-size:.88rem}
+footer .wrap{display:grid;gap:12px}
+footer .row{display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center}
+footer a{color:var(--muted)}
+
+/* ---------- responsive */
+@media (max-width:900px){
+  .hero{padding:118px 0 64px}
+  .hero .wrap,.feat,.honest .wrap,.buy-card{grid-template-columns:1fr;gap:36px}
+  .feat:nth-child(even) .feat-text{order:0}
+  .promise ul{grid-template-columns:1fr 1fr}
+  .more-grid{grid-template-columns:1fr 1fr}
+  .top nav a:not(.buy-sm){display:none}
+  .buy-card{padding:36px 28px}
+}
+@media (max-width:560px){
+  .wrap{padding:0 16px}
+  .promise ul,.more-grid{grid-template-columns:1fr}
+  .feat{padding:28px 0}
+  .feat h3{font-size:1.7rem}
+  .buy-card .big{font-size:3.2rem}
+  .brand span{font-size:1.15rem}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="img/icon-180.png" alt=""><span>The Night Almanac</span></a>
+    <nav aria-label="Main">
+      <a href="#features">What's inside</a>
+      <a href="#honest">Our approach</a>
+      <a href="#faq">Questions</a>
+      <a class="buy-sm" data-buy href="#buy">Buy · $9.99</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <svg class="stars" aria-hidden="true" id="stars"></svg>
+  <div class="moon-deco" aria-hidden="true"></div>
+  <div class="wrap">
+    <div>
+      <p class="eyebrow" style="color:var(--gold)">Western &amp; Vedic astrology</p>
+      <h1 style="margin-top:16px">Your stars, read <em>clearly</em> and honestly.</h1>
+      <p class="lede">The Night Almanac reads your real birth chart in plain language: what tradition says is good, what's hard, and why. It shows its reasoning so you can check it, and it never tells you your future is fixed.</p>
+      <div class="cta">
+        <a class="btn btn-gold" data-buy href="#buy">Buy for <span class="price">$9.99</span></a>
+        <a class="btn btn-ghost" href="#features">See what's inside</a>
+      </div>
+      <p class="fine-hero">One payment. For Mac and Windows. No subscription, no account, no ads.</p>
+    </div>
+    <div class="hero-shot">
+      <div class="frame"><div class="bar"><i></i><i></i><i></i></div>
+        <picture>
+          <source srcset="img/chart-dark.webp" media="(prefers-color-scheme: dark)">
+          <img src="img/chart-light.webp" width="1600" height="1030" alt="The Your chart screen: a birth chart wheel beside a plain-language reading of the Sun in Gemini in the 9th house.">
+        </picture>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="promise" aria-label="What you get">
+  <div class="wrap">
+    <ul>
+      <li><strong>Pay once</strong><span>$9.99, yours to keep. No subscription and no upsells.</span></li>
+      <li><strong>Private</strong><span>Everything runs on your computer. Your birth details never leave it.</span></li>
+      <li><strong>Two traditions</strong><span>Switch between Western and Vedic with one tap.</span></li>
+      <li><strong>Shows its work</strong><span>Every reading explains which placements it comes from.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">What's inside</p>
+      <h2>An almanac for your whole sky</h2>
+      <p>Built on the Swiss Ephemeris, the same astronomical engine professional astrologers use, and written for people who don't speak astrology yet.</p>
+    </div>
+
+    <article class="feat">
+      <div class="feat-text">
+        <p class="eyebrow">Today, this month, this year</p>
+        <h3>Forecasts for the parts of life you care about</h3>
+        <p>Each day, week and year is rated area by area, with a short reason for each.</p>
+        <ul>
+          <li>Love, career, money, home, health and friends</li>
+          <li>The Moon's phase and sign, retrogrades and what's touching your chart</li>
+          <li>Step forward or back to plan around any date</li>
+        </ul>
+      </div>
+      <figure class="frame"><div class="bar"><i></i><i></i><i></i></div>
+        <picture><source srcset="img/today-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/today-light.webp" width="1600" height="1030" alt="The Today screen: a day rated by area, such as Career & work: Supportive and Love & relationships: Challenging, each with a sentence of explanation."></picture>
+      </figure>
+    </article>
+
+    <article class="feat">
+      <div class="feat-text">
+        <p class="eyebrow">Compatibility</p>
+        <h3>You and someone else</h3>
+        <p>Add a partner, friend or family member and see how your charts fit together.</p>
+        <ul>
+          <li>Western synastry, theme by theme: attraction, emotional bond, communication, staying power and friction</li>
+          <li>The traditional Vedic 36-point Ashtakoota (Guna Milan) score, factor by factor</li>
+          <li>Works without their birth time, and says what it can't tell you</li>
+        </ul>
+      </div>
+      <figure class="frame"><div class="bar"><i></i><i></i><i></i></div>
+        <picture><source srcset="img/compat-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/compat-light.webp" width="1600" height="1030" alt="The Compatibility screen comparing two charts, with themes rated Supportive, Challenging or Mixed."></picture>
+      </figure>
+    </article>
+
+    <article class="feat">
+      <div class="feat-text">
+        <p class="eyebrow">Star lore</p>
+        <h3>The old techniques, explained</h3>
+        <p>The traditions astrologers used for centuries, worked out for your place and moment.</p>
+        <ul>
+          <li>Planetary hours and the void-of-course Moon, live</li>
+          <li>Decans and their tarot cards, fixed stars and the 28 lunar mansions</li>
+          <li>The Hindu almanac (panchanga), Rahu Kaal and classic Vedic yogas</li>
+          <li>Your birthday chart (solar return) and eclipses that touch your chart</li>
+        </ul>
+      </div>
+      <figure class="frame"><div class="bar"><i></i><i></i><i></i></div>
+        <picture><source srcset="img/lore-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/lore-light.webp" width="1600" height="1030" alt="The Star lore screen showing the current planetary hour and whether the Moon is void of course."></picture>
+      </figure>
+    </article>
+
+    <article class="feat">
+      <div class="feat-text">
+        <p class="eyebrow">World map</p>
+        <h3>Where on Earth your stars shine</h3>
+        <p>Astrocartography draws your planets' lines across the globe, so you can see what tradition says about places you live, love or want to visit.</p>
+      </div>
+      <figure class="frame"><div class="bar"><i></i><i></i><i></i></div>
+        <picture><source srcset="img/map-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/map-light.webp" width="1600" height="1030" alt="A world map with planetary lines drawn across it."></picture>
+      </figure>
+    </article>
+  </div>
+</section>
+
+<section class="more" aria-label="Also included">
+  <div class="wrap">
+    <div class="more-grid">
+      <div class="tile"><div class="glyph">?</div><h3>Ask a question</h3><p>Yes-or-no answers about work, marriage, travel and more, using Krishnamurti Paddhati and Western timing techniques.</p></div>
+      <div class="tile"><div class="glyph">☉</div><h3>Your chart, explained</h3><p>Tap any planet to read what it means for you: what it runs, how it shows up, and where.</p></div>
+      <div class="tile"><div class="glyph">∞</div><h3>Life timeline</h3><p>The long chapters of your life, from Vedic dasha periods to Western time-lord techniques.</p></div>
+      <div class="tile"><div class="glyph">7</div><h3>Numerology</h3><p>Your life path and name numbers, worked out from your birth date and full name.</p></div>
+      <div class="tile"><div class="glyph">✓</div><h3>Check past events</h3><p>Enter moments from your past and see what the sky was doing, so you can judge for yourself.</p></div>
+      <div class="tile"><div class="glyph">Aa</div><h3>A built-in glossary</h3><p>Tap any underlined word, like house or nakshatra, to see what it means in plain English.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="honest" id="honest">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">Our approach</p>
+      <h2>Wise, not scary</h2>
+      <p>Many astrology apps keep you anxious so you keep paying. The Night Almanac does the opposite. Hard placements come with what you can do about them, readings never claim your future is fixed, and nothing is sold to you inside the app.</p>
+      <p>It doesn't answer questions about health, missing people, legal cases or money decisions; those need real help. And it's open about what astrology is: a cultural tradition to reflect with, not a science.</p>
+    </div>
+    <div style="display:grid;gap:28px;align-content:center">
+      <p class="quote">"Readings describe what each tradition says. Your choices are always yours."<small>From the app's opening notice</small></p>
+      <p class="quote">"Your birth details never leave this device."<small>No accounts, no tracking, no ads. It works offline.</small></p>
+    </div>
+  </div>
+</section>
+
+<section class="buy" id="buy">
+  <div class="wrap">
+    <div class="buy-card">
+      <div>
+        <h2>Get The Night Almanac</h2>
+        <p class="big" style="margin-top:18px">$9.99<small>once</small></p>
+        <ul>
+          <li>Every feature, no tiers</li>
+          <li>All three downloads included</li>
+          <li>Works offline, on your computer</li>
+          <li>Secure checkout by Gumroad</li>
+        </ul>
+        <div class="cta"><a class="btn btn-gold" data-buy href="#buy">Buy now</a></div>
+      </div>
+      <div class="platforms" aria-label="Which download do I need?">
+        <p style="color:var(--night-muted);font-size:.92rem">After you buy, pick the file for your computer:</p>
+        <div class="plat"><b>Mac with Apple chip</b><span>M1, M2, M3, M4 and newer</span></div>
+        <div class="plat"><b>Mac with Intel chip</b><span>Most Macs from before 2021</span></div>
+        <div class="plat"><b>Windows PC</b><span>Windows 10 or 11, 64-bit</span></div>
+        <p style="color:var(--night-muted);font-size:.85rem">Not sure which Mac you have? Apple menu › About This Mac: it says "Chip" (Apple) or "Processor" (Intel).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="wrap">
+    <div class="section-head"><p class="eyebrow">Questions</p><h2>Good to know</h2></div>
+    <details><summary>Is this a subscription?</summary><p>No. You pay $9.99 once and keep the app. There are no in-app purchases.</p></details>
+    <details><summary>What do I need to enter?</summary><p>Your birth date, birthplace and, ideally, your birth time. The time sharpens your rising sign and houses; if you don't know it, the app still works and tells you which readings depend on it.</p></details>
+    <details><summary>Where does my information go?</summary><p>Nowhere. The app makes no internet connections; your details are saved only on your own computer. Gumroad handles the purchase and receives your email and payment details, not your birth data.</p></details>
+    <details><summary>Does it work on my phone?</summary><p>Not yet. The Night Almanac is a desktop app for Mac and Windows.</p></details>
+    <details><summary>My Mac or PC warns me when I open it. Is that normal?</summary><p>Yes. The app is made by an independent developer and isn't registered with Apple or Microsoft, so your computer shows a warning the first time. Each download includes a short "How to open" note with the steps.</p></details>
+    <details><summary>Western or Vedic: which should I use?</summary><p>Both are included. Western is most common in the US and Europe; Vedic comes from India and measures the zodiac differently, so your signs can differ. Many people like comparing the two.</p></details>
+    <details><summary>Is it open source?</summary><p>Yes. The source code is public under the AGPL license on <a href="https://github.com/thenightalmanac/night-almanac">GitHub</a>. Buying supports the work and gets you the ready-to-open app.</p></details>
+    <details><summary>Can I get a refund?</summary><p data-refund>If it isn't for you, ask through your Gumroad receipt.</p></details>
+    <details><summary>How do I get help?</summary><p>Reply to your Gumroad receipt email and it reaches us.</p></details>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row"><strong style="color:var(--ink);font:600 1.1rem var(--display)">The Night Almanac</strong>
+      <a href="https://github.com/thenightalmanac/night-almanac">Source code</a>
+      <a href="#buy">Buy</a>
+    </div>
+    <p>For adults 18 and over. For entertainment and reflection: astrology is a cultural tradition, and studies haven't found that it predicts events or personality. Nothing in the app is medical, mental health, legal or financial advice.</p>
+    <p>Struggling? In the US, call or text 988. Elsewhere, find a helpline at findahelpline.com.</p>
+    <p>Calculations by the Swiss Ephemeris (© Astrodienst AG, AGPL). Fonts: Cormorant Garamond and Jost (SIL Open Font License). This site uses no cookies or trackers; the host may keep standard server logs.</p>
+  </div>
+</footer>
+
+<script>
+// Paste the Gumroad product link here once it's published.
+const BUY_URL = "https://nightalmanac.gumroad.com/l/app";
+if (BUY_URL) document.querySelectorAll("[data-buy]").forEach((a) => { a.href = BUY_URL; });
+
+// A quiet field of stars in the hero.
+(function () {
+  const svg = document.getElementById("stars"), w = 1400, h = 900;
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`); svg.setAttribute("preserveAspectRatio", "xMidYMid slice");
+  let seed = 7; const r = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  let s = "";
+  for (let i = 0; i < 140; i++) {
+    const x = r() * w, y = r() * h, rad = r() < 0.08 ? 1.6 : r() * 0.9 + 0.3, o = (r() * 0.6 + 0.25).toFixed(2);
+    s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rad.toFixed(2)}" fill="#f2e2be" opacity="${o}"/>`;
+  }
+  svg.innerHTML = s;
+})();
+</script>
+</body>
+</html>
