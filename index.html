@@ -381,6 +381,7 @@ footer a{color:var(--muted)}
 // Paste the Gumroad product link here once it's published.
 const BUY_URL = "https://nightalmanac.gumroad.com/l/app";
 if (BUY_URL) document.querySelectorAll("[data-buy]").forEach((a) => { a.href = BUY_URL; });
+if (location.hash === "#open") { const d = document.getElementById("open"); if (d) d.open = true; }
 
 // A quiet field of stars in the hero.
 (function () {
